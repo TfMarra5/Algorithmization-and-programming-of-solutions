@@ -7,23 +7,21 @@ public class Main {
         Game.drawFrogsOnBoard();
 
         Scanner sc = new Scanner(System.in);
-        while (true) {
+        while (Game.isRunning()) {
             Board.print(Game.getReverseCount(), Game.getRemoveCount(), Game.getEaten());
-
             System.out.print("> ");
             String cmd = sc.nextLine();
-            
+
             if (cmd.length() == 1 && "wasd".contains(cmd)) {
                 Snake.move(cmd);
             } else if (cmd.equals("r")) {
-                // reverse snake
+                Snake.reverseBoth();
             } else if (cmd.equals("e")) {
-                // snake sheds it's skin
+                Snake.toggleSkin();
             } else if (cmd.equals("x")) {
                 break;
             }
         }
         sc.close();
     }
-
 }
