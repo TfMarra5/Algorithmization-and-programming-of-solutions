@@ -2,91 +2,85 @@ package compression;
 
 public class NucleotideCompressor {
 
+    // Task 1 – Compression
     public static byte[] compress(String nucleotides) {
-        // TODO: Complete this method for Block 3 Task 1
-        byte[] res = new byte[1];
+        if (nucleotides == null) {
+            return new byte[] { 0 };
+        }
+
+        int length = nucleotides.length();
+
+        int dataBytes = (length + 3) / 4; 
+        
+        byte[] res = new byte[1 + dataBytes];
+        res[0] = (byte) length;
+
+        int byteIndex = 1;
+
+        int bitPos = 6; 
+        byte current = 0;
+
+        for (int i = 0; i < length; i++) {
+            char c = nucleotides.charAt(i);
+            int val;
+            switch (c) {
+                case 'A': val = 0b00; break;
+                case 'C': val = 0b01; break;
+                case 'G': val = 0b10; break;
+                case 'T': val = 0b11; break;
+                default:  val = 0b00; break;
+            }
+
+            current |= (byte) (val << bitPos);
+            if (bitPos == 0) {
+                res[byteIndex++] = current;
+                current = 0;
+                bitPos = 6;
+            } else {
+                bitPos -= 2;
+            }
+        }
+        if (byteIndex < res.length) { 
+            res[byteIndex] = current;
+        }
+
         return res;
     }
 
+    // Task 2 - decompress
     public static String decompress(byte[] nucleotides) {
-        // TODO: Complete this method for Block 3 Task 2
-        return "";
-    }
-    
-    public static void compressExample() {
-        // In this example we have a byte where the two
-        // most-significant bits represent the nucleotide T (11).
-        // The rest of the bits are not used for now (zeros).
-        byte data = (byte) 0b11000000; // can replace with hexadecimal: (byte) 0xC0
-		System.out.println("initial data:");
-		System.out.println(toBits(data));
-		
-		// We want to encode a nucleotide C (01),
-		// so our data will look like this: 11010000
-		
-		// create a nucleotide C (code 1);
-		byte n = 1;
-		System.out.println("\nnucleotide C:");
-		System.out.println(toBits(n));
-		
-		// shift the nucleotide 4 positions to the left
-		byte res = (byte) (n << 4);
-		System.out.println("\nresult after left shift:");
-		System.out.println(toBits(res));
-		
-		// apply bitwise OR to combine the nucleotide with the data
-		res = (byte) (data | res);
-		System.out.println("\nresult after bitwise OR:");
-		System.out.println(toBits(res));
-		
-		// the result shows the compressed nucleotide
-		System.out.printf("\nresult: %d\n", res);
-    }
-    
-    public static void decompressExample() {
-        // In this example, we have a byte that has nucleotides:
-        // T (11), C (01), A (00) and G (10) encoded in it.
-        byte data = (byte) 0b11010010; // can replace with hexadecimal: (byte) 0xD2
-		System.out.println("initial data:");
-		System.out.println(toBits(data));
-		
-        // We want to decompress the nucleotide C (01).
+        if (nucleotides == null || nucleotides.length == 0) {
+            return "";
+        }
 
-		// shift the nucleotide 4 positions to the right
-		byte res = (byte) (data >> 4);
-		System.out.println("\nresult after right shift:");
-		System.out.println(toBits(res));
-		
-		// create a mask
-		byte mask = 0b00000011; // 3
-		
-		// apply bitwise AND to get rid of the first 6 bits
-		res = (byte) (res & mask);
-		System.out.println("\nresult after bitwise AND:");
-		System.out.println(toBits(res));
-		
-		// the result is 1, therefore the nucleotide is C
-		System.out.printf("\nresult: %d\n", res);
-    }
+        int length = nucleotides[0] & 0xFF;
+        StringBuilder sb = new StringBuilder(length);
 
-    public static String toBits(byte n) {
-        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            int byteIndex = 1 + (i / 4);
+            int shift = 6 - 2 * (i % 4);
 
-        int mask = 1 << 7;
-        for (int i = 0; i < 8; i++) {
-            int a = (byte) (n & mask);
-            if (a > 0 || a == Byte.MIN_VALUE) {
-                sb.append('1');
-            } else {
-                sb.append('0');
+            int bits = (nucleotides[byteIndex] >> shift) & 0b11;
+
+            char c;
+            switch (bits) {
+                case 0b00: c = 'A'; break;
+                case 0b01: c = 'C'; break;
+                case 0b10: c = 'G'; break;
+                case 0b11: c = 'T'; break;
+                default:   c = 'A'; break;
             }
-            mask >>>= 1;
-            if ((i + 1) % 8 == 0) {
-                sb.append(' ');
-            }
+
+            sb.append(c);
         }
 
         return sb.toString();
     }
 
+    // helper para imprimir bits (usado no Main)
+    public static String toBits(byte b) {
+        String binaryString = String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
+
+        return binaryString + " ";
+    }
 }
