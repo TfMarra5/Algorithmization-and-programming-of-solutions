@@ -1,0 +1,34 @@
+1,1.
+
+List:
+- An ordered collection
+- Allows elements to be repeated
+- Element  are accessed using their index, like 0/1/2 etc
+Set (HashSet):
+- Does not allow duplicate elements
+- Does not guarantee any specific order
+- Internally uses hashing, making add, search and remove operations generally fast
+
+Map (HashMap)
+- Stores data in key–value pairs
+- Keys must be unique, but values can be duplicated
+- Provides very fast lookups by key using hashing
+
+1,2.
+Stack (LIFO Stack):
+- "Last In, First Out": the most recently added item is the first to be removed
+- Common operations include:
+    -> push (to add an item)
+    -> pop (to remove the top item)
+    -> peek (to view the top item without removing it)
+
+Queue (FIFO Queue):
+- "Firstt In, First Out": the earliest added item is removed first
+- Common operations include
+    ->  add or offer (to add to the end)
+    -> remove or poll (to remove from the front)
+    -> peek (to view the item at the front)
+Deque:
+-A double-ended queue
+- Alows adding and removing items from both the front and back
+- Can act like a stack  using one end or a queue using both ends
