@@ -20,15 +20,30 @@ public class Main {
 
         String name;
 
+        // 76213
         name = book.get("76213");
-        System.out.println("76213 -> " + (name == null ? "not found" : name));
+        if (name == null) {
+            System.out.println("76213 -> not found");
+        } else {
+            System.out.println("76213 -> " + name);
+        }
 
+        // 910
         name = book.get("910");
-        System.out.println("910 -> " + (name == null ? "not found" : name));
+        if (name == null) {
+            System.out.println("910 -> not found");
+        } else {
+            System.out.println("910 -> " + name);
+        }
 
+        // 911 (removed)
         book.remove("911");
         name = book.get("911");
-        System.out.println("911 -> " + (name == null ? "not found" : name));
+        if (name == null) {
+            System.out.println("911 -> not found");
+        } else {
+            System.out.println("911 -> " + name);
+        }
 
         book.put("76213", "dad");
         System.out.println("76213 -> " + book.get("76213"));

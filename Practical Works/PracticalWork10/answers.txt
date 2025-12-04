@@ -2,25 +2,25 @@
 
 List:
 - An ordered collection
-- Allows elements to be repeated
+- Allow elements to be repeated
 - Element  are accessed using their index, like 0/1/2 etc
 Set (HashSet):
 - Does not allow duplicate elements
 - Does not guarantee any specific order
-- Internally uses hashing, making add, search and remove operations generally fast
+- internally uses hashing, making add, search and remove operations generally fast
 
-Map (HashMap)
-- Stores data in key–value pairs
-- Keys must be unique, but values can be duplicated
-- Provides very fast lookups by key using hashing
+Map ( hashmap)
+- stores data in key–value pairs
+- keys must be unique, but values can be duplicated
+- provides very fast lookups by key using hashing
 
 1,2.
 Stack (LIFO Stack):
 - "Last In, First Out": the most recently added item is the first to be removed
 - Common operations include:
-    -> push (to add an item)
+    -> push (to add an item )
     -> pop (to remove the top item)
-    -> peek (to view the top item without removing it)
+    -> peek( to view the top item without removing it )
 
 Queue (FIFO Queue):
 - "Firstt In, First Out": the earliest added item is removed first
