@@ -30,7 +30,7 @@ Applied problem-solving implementations using Java.
 
 ---
 
-## 🚀 How to Run the Programs (Professional)
+## 🚀 How to Run the Programs
 
 ### **Recommended JDK Version**
 
