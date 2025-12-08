@@ -19,7 +19,7 @@ public final class PersonKey {
     @Override
     public int hashCode() {
         int h = doc.hashCode();
-        h = h * 37 + country.hashCode();   // natural, human-made variation
+        h = h * 37 + country.hashCode(); 
         return h;
     }
 
