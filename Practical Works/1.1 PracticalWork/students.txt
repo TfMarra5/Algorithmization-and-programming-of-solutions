@@ -1,0 +1,7 @@
+Liepins Andris 4 5 3 5
+Riekstins Maris 7 8 6 6 8 
+Ozols Peteris 10 9 9 9 9 
+Petersone Ilze Mara 8 8 8 8 8 9 10
+Liepa Mara 7 8 9 7 8 
+Liepins Ozolins Peteris Edgars 2 4 3 3 5 2
+Klavina Inga 7 8 7 7 
