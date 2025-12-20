@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
 
@@ -7,11 +8,12 @@ public class Maze_File_Handler {
     public static int[][] loadMaze(String filename) throws IOException {
 
         BufferedReader br = null;
+
         try {
             br = new BufferedReader(new FileReader(filename));
 
-            int[][] rows = new int[64][];
-            int count = 0;
+            ArrayList<int[]> list = new ArrayList<int[]>();
+            int expectedW = -1;
 
             String line;
             while (true) {
@@ -25,57 +27,56 @@ public class Maze_File_Handler {
                     continue;
                 }
 
-                String s = "";
+                ArrayList<Integer> tmp = new ArrayList<Integer>();
+
                 int i = 0;
                 while (i < line.length()) {
                     char c = line.charAt(i);
-                    if (c != ' ' && c != '\t' && c != '\r') {
-                        s = s + c;
+
+                    if (c == '0') {
+                        tmp.add(Integer.valueOf(0));
+                    } else if (c == '1') {
+                        tmp.add(Integer.valueOf(1));
+                    } else if (c == ' ' || c == '\t' || c == '\r') {
+                    } else {
+                        throw new IOException("Invalid char in maze file: '" + c + "'");
                     }
+
                     i++;
                 }
 
-                if (s.length() == 0) {
+                if (tmp.size() == 0) {
                     continue;
                 }
 
-                int[] row = new int[s.length()];
-                int j = 0;
-                while (j < s.length()) {
-                    char ch = s.charAt(j);
-                    if (ch == '0') {
-                        row[j] = 0;
-                    } else if (ch == '1') {
-                        row[j] = 1;
-                    } else {
-                        row[j] = 0;
+                if (expectedW == -1) {
+                    expectedW = tmp.size();
+                } else {
+                    if (tmp.size() != expectedW) {
+                        throw new IOException("Maze is not rectangular. Expected width " + expectedW + " but got " + tmp.size());
                     }
+                }
+
+                int[] row = new int[tmp.size()];
+                int j = 0;
+                while (j < tmp.size()) {
+                    row[j] = tmp.get(j).intValue();
                     j++;
                 }
 
-                if (count >= rows.length) {
-                    int[][] tmp = new int[rows.length * 2][];
-                    int k = 0;
-                    while (k < rows.length) {
-                        tmp[k] = rows[k];
-                        k++;
-                    }
-                    rows = tmp;
-                }
-
-                rows[count] = row;
-                count++;
+                list.add(row);
             }
 
-            if (count == 0) {
+            if (list.size() == 0) {
                 return new int[0][0];
             }
 
-            int[][] maze = new int[count][];
-            int r = 0;
-            while (r < count) {
-                maze[r] = rows[r];
-                r++;
+            int[][] maze = new int[list.size()][expectedW];
+
+            int y = 0;
+            while (y < list.size()) {
+                maze[y] = list.get(y);
+                y++;
             }
 
             return maze;
@@ -87,33 +88,50 @@ public class Maze_File_Handler {
         }
     }
 
+    private static void ensureParentDir(String filename) throws IOException {
+        File f = new File(filename);
+        File p = f.getParentFile();
+
+        if (p != null) {
+            if (p.exists() == false) {
+                boolean ok = p.mkdirs();
+                if (ok == false) {
+                    throw new IOException("Could not create directory: " + p.getPath());
+                }
+            }
+        }
+    }
+
     public static void saveSolvedMaze(int[][] maze, Deque<Point> path, String filename) throws IOException {
 
-        char[][] solved = new char[maze.length][maze[0].length];
+        ensureParentDir(filename);
 
-        int i = 0;
-        while (i < maze.length) {
-            int j = 0;
-            while (j < maze[0].length) {
-                if (maze[i][j] == 1) {
-                    solved[i][j] = '1';
+        char[][] out = new char[maze.length][maze[0].length];
+
+        int y = 0;
+        while (y < maze.length) {
+            int x = 0;
+            while (x < maze[0].length) {
+                if (maze[y][x] == 1) {
+                    out[y][x] = '1';
                 } else {
-                    solved[i][j] = '0';
+                    out[y][x] = '0';
                 }
-                j++;
+                x++;
             }
-            i++;
+            y++;
         }
 
         if (path != null) {
             Iterator<Point> it = path.iterator();
             while (it.hasNext()) {
                 Point p = it.next();
+
                 if (p != null) {
-                    if (p.y >= 0 && p.y < solved.length) {
-                        if (p.x >= 0 && p.x < solved[0].length) {
-                            if (solved[p.y][p.x] == '0') {
-                                solved[p.y][p.x] = '+';
+                    if (p.y >= 0 && p.y < out.length) {
+                        if (p.x >= 0 && p.x < out[0].length) {
+                            if (out[p.y][p.x] == '0') {
+                                out[p.y][p.x] = '+';
                             }
                         }
                     }
@@ -125,15 +143,15 @@ public class Maze_File_Handler {
         try {
             bw = new BufferedWriter(new FileWriter(filename));
 
-            int a = 0;
-            while (a < solved.length) {
-                int b = 0;
-                while (b < solved[a].length) {
-                    bw.write(solved[a][b]);
-                    b++;
+            int i = 0;
+            while (i < out.length) {
+                int j = 0;
+                while (j < out[i].length) {
+                    bw.write(out[i][j]);
+                    j++;
                 }
                 bw.newLine();
-                a++;
+                i++;
             }
 
         } finally {
@@ -145,19 +163,21 @@ public class Maze_File_Handler {
 
     public static void saveMaze(int[][] maze, String filename) throws IOException {
 
+        ensureParentDir(filename);
+
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new FileWriter(filename));
 
-            int i = 0;
-            while (i < maze.length) {
-                int j = 0;
-                while (j < maze[i].length) {
-                    bw.write(String.valueOf(maze[i][j]));
-                    j++;
+            int y = 0;
+            while (y < maze.length) {
+                int x = 0;
+                while (x < maze[y].length) {
+                    bw.write(String.valueOf(maze[y][x]));
+                    x++;
                 }
                 bw.newLine();
-                i++;
+                y++;
             }
 
         } finally {

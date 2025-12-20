@@ -1,82 +1,79 @@
-import java.util.*;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
 public class Maze_Solution {
 
-    private int[][] maze;
-    private int rows;
-    private int cols;
-
-    private Point start;
-    private Point end;
+    private final int[][] maze;
+    private final int rows;
+    private final int cols;
+    private final Point start;
+    private final Point end;
 
     public Maze_Solution(int[][] maze, Point start, Point end) {
         this.maze = maze;
         this.rows = maze.length;
         this.cols = maze[0].length;
-
         this.start = start;
         this.end = end;
     }
 
-    public static Deque<Point> solveMaze(int[][] maze, Point start, Point end) {
-        Maze_Solution ms = new Maze_Solution(maze, start, end);
-        // bfs for shortest path
-        return ms.solveBFS();
-    }
-
-    // simple check
-    private boolean okCell(int x, int y) {
-        if (x < 0) {
-            return false;
-        }
-        if (y < 0) {
-            return false;
-        }
-        if (x >= cols) {
-            return false;
-        }
-        if (y >= rows) {
-            return false;
-        }
-        if (maze[y][x] != 0) {
-            return false;
-        }
+    private boolean ok(int x, int y) {
+        if (x < 0) return false;
+        if (y < 0) return false;
+        if (x >= cols) return false;
+        if (y >= rows) return false;
+        if (maze[y][x] != 0) return false;
         return true;
     }
 
     public Deque<Point> solveDFS() {
-        Deque<Point> st = new LinkedList<Point>();
-        HashSet<Point> vis = new HashSet<Point>();
-        HashMap<Point, Point> parent = new HashMap<Point, Point>();
 
-        st.addLast(start);
-        vis.add(start);
-        parent.put(start, null);
+        Deque<Point> stack = new LinkedList<Point>();
+        Set<Point> visited = new HashSet<Point>();
 
-        while (st.isEmpty() == false) {
-            Point cur = st.pollLast();
+        stack.addLast(start);
+        visited.add(start);
+
+        int[] dx = new int[] {0, 1, 0, -1};
+        int[] dy = new int[] {-1, 0, 1, 0};
+
+        while (stack.isEmpty() == false) {
+
+            Point cur = stack.pollLast();
 
             if (cur.equals(end)) {
-                return buildPath(parent, cur);
+                stack.addLast(cur);
+                return stack;
             }
 
-            // neighbors (top, right, bottom, left)
-            int[] dx = new int[] {0, 1, 0, -1};
-            int[] dy = new int[] {-1, 0, 1, 0};
+            boolean moved = false;
+            int i = 0;
 
-            for (int i = 0; i < 4; i++) {
+            while (i < 4) {
+
                 int nx = cur.x + dx[i];
                 int ny = cur.y + dy[i];
 
-                if (okCell(nx, ny)) {
+                if (ok(nx, ny)) {
                     Point np = new Point(nx, ny);
 
-                    if (vis.contains(np) == false) {
-                        vis.add(np);
-                        parent.put(np, cur);
-                        st.addLast(np);
+                    if (visited.contains(np) == false) {
+                        stack.addLast(cur);
+                        visited.add(np);
+                        stack.addLast(np);
+                        moved = true;
+                        break;
                     }
                 }
+
+                i++;
+            }
+
+            if (moved == false) {
             }
         }
 
@@ -84,59 +81,54 @@ public class Maze_Solution {
     }
 
     public Deque<Point> solveBFS() {
-        Deque<Point> q = new LinkedList<Point>();
-        HashMap<Point, Point> parent = new HashMap<Point, Point>();
-        HashSet<Point> vis = new HashSet<Point>();
 
-        q.addLast(start);
-        vis.add(start);
-        parent.put(start, null);
+        Deque<Point> queue = new LinkedList<Point>();
+        Map<Point, Point> visited = new HashMap<Point, Point>();
 
-        while (q.isEmpty() == false) {
-            Point cur = q.pollFirst();
+        queue.addLast(start);
+        visited.put(start, null);
+
+        int[] dx = new int[] {0, 1, 0, -1};
+        int[] dy = new int[] {-1, 0, 1, 0};
+
+        while (queue.isEmpty() == false) {
+
+            Point cur = queue.pollFirst();
 
             if (cur.equals(end)) {
-                return buildPath(parent, cur);
+                return buildPath(visited, cur);
             }
-
-            // neighbors (top, right, bottom, left)
-            int[] dx = new int[] {0, 1, 0, -1};
-            int[] dy = new int[] {-1, 0, 1, 0};
 
             int i = 0;
             while (i < 4) {
-                int nx;
-                int ny;
-                nx = cur.x + dx[i];
-                ny = cur.y + dy[i];
-                i = i + 1;
 
-                if (okCell(nx, ny)) {
+                int nx = cur.x + dx[i];
+                int ny = cur.y + dy[i];
+
+                if (ok(nx, ny)) {
                     Point np = new Point(nx, ny);
 
-                    if (vis.contains(np) == false) {
-                        vis.add(np);
-                        parent.put(np, cur);
-                        q.addLast(np);
+                    if (visited.containsKey(np) == false) {
+                        visited.put(np, cur);
+                        queue.addLast(np);
                     }
                 }
+
+                i++;
             }
         }
 
         return null;
     }
 
-    private Deque<Point> buildPath(HashMap<Point, Point> parent, Point last) {
-        if (parent.containsKey(last) == false) {
-            return null;
-        }
+    private Deque<Point> buildPath(Map<Point, Point> visited, Point last) {
 
         Deque<Point> path = new LinkedList<Point>();
-        Point cur = last;
 
+        Point cur = last;
         while (cur != null) {
             path.addFirst(cur);
-            cur = parent.get(cur);
+            cur = visited.get(cur);
         }
 
         return path;

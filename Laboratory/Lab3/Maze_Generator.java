@@ -14,7 +14,6 @@ public class Maze_Generator {
         if (h % 2 == 0) {
             h = h + 1;
         }
-
         if (w % 2 == 0) {
             w = w + 1;
         }
@@ -47,24 +46,16 @@ public class Maze_Generator {
             int[] options = new int[4];
             int optCount = 0;
 
-            for (int i = 0; i < 4; i++) {
+            int i = 0;
+            while (i < 4) {
                 int nx = cur.x + dx[i];
                 int ny = cur.y + dy[i];
 
                 boolean inside = true;
-
-                if (nx <= 0) {
-                    inside = false;
-                }
-                if (nx >= w - 1) {
-                    inside = false;
-                }
-                if (ny <= 0) {
-                    inside = false;
-                }
-                if (ny >= h - 1) {
-                    inside = false;
-                }
+                if (nx <= 0) inside = false;
+                if (nx >= w - 1) inside = false;
+                if (ny <= 0) inside = false;
+                if (ny >= h - 1) inside = false;
 
                 if (inside == true) {
                     if (m[ny][nx] == WALL) {
@@ -72,6 +63,8 @@ public class Maze_Generator {
                         optCount = optCount + 1;
                     }
                 }
+
+                i++;
             }
 
             if (optCount > 0) {
@@ -93,25 +86,28 @@ public class Maze_Generator {
             }
         }
 
+        m[0][0] = PATH;
         m[0][1] = PATH;
+        m[1][0] = PATH;
+        m[1][1] = PATH;
+
+        m[h - 1][w - 1] = PATH;
         m[h - 1][w - 2] = PATH;
+        m[h - 2][w - 1] = PATH;
+        m[h - 2][w - 2] = PATH;
 
         return m;
     }
 
     public static void main(String[] args) {
-        int H = 21;
-        int W = 21;
-        String out = "Mazes/generated_maze_by_DFS.txt";
 
-        int[][] maze = generate(H, W);
+        int[][] gen = generate(21, 21);
 
         try {
-            Maze_File_Handler.saveMaze(maze, out);
-            System.out.println("Generated maze (" + H + "x" + W + ") saved to " + out);
+            Maze_File_Handler.saveMaze(gen, "Mazes/generated_maze.txt");
+            System.out.println("Generated maze saved.");
         } catch (IOException e) {
-            System.out.println("Error saving generated maze: " + e.getMessage());
-            System.out.println("Maybe the folder 'Mazes' does not exist.");
+            System.out.println("Could not save generated maze.");
         }
     }
 }
